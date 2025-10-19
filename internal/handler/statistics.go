@@ -1,6 +1,9 @@
 package handler
 
-import "net/http"
+import (
+	"log/slog"
+	"net/http"
+)
 
 // StatisticsParams describes the request parameters in the statistics response.
 type StatisticsParams struct {
@@ -19,14 +22,19 @@ type StatisticsResponse struct {
 
 // Statistics returns the most frequent FizzBuzz request observed so far.
 func (h *Handler) Statistics(w http.ResponseWriter, r *http.Request) {
+	var logger *slog.Logger
+	if h != nil {
+		logger = h.logger
+	}
+
 	if h == nil || h.store == nil {
-		respondError(w, http.StatusNotFound, "no statistics available")
+		respondError(logger, w, http.StatusNotFound, "no statistics available")
 		return
 	}
 
 	stats, ok := h.store.GetMostFrequent()
 	if !ok {
-		respondError(w, http.StatusNotFound, "no statistics available")
+		respondError(h.logger, w, http.StatusNotFound, "no statistics available")
 		return
 	}
 
@@ -41,5 +49,5 @@ func (h *Handler) Statistics(w http.ResponseWriter, r *http.Request) {
 		Hits: stats.Hits,
 	}
 
-	respondJSON(w, http.StatusOK, response)
+	respondJSON(h.logger, w, http.StatusOK, response)
 }

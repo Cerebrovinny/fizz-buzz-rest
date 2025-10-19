@@ -16,7 +16,7 @@ import (
 
 func TestHandler_Statistics_NoData(t *testing.T) {
 	store := statistics.NewStore()
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	rec := callStatisticsHandler(t, h)
 
@@ -32,7 +32,7 @@ func TestHandler_Statistics_SingleRequest(t *testing.T) {
 	params := statistics.RequestParams{Int1: 3, Int2: 5, Limit: 15, Str1: "fizz", Str2: "buzz"}
 	store.Record(params)
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	rec := callStatisticsHandler(t, h)
 
@@ -53,7 +53,7 @@ func TestHandler_Statistics_MultipleRequests(t *testing.T) {
 	recordRequest(store, lessFrequent, 5)
 	recordRequest(store, rare, 3)
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rec := callStatisticsHandler(t, h)
 
 	if rec.Code != http.StatusOK {
@@ -70,7 +70,7 @@ func TestHandler_Statistics_UpdatesOverTime(t *testing.T) {
 
 	recordRequest(store, early, 5)
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	rec := callStatisticsHandler(t, h)
 	if rec.Code != http.StatusOK {
@@ -92,7 +92,7 @@ func TestHandler_Statistics_JSONFormat(t *testing.T) {
 	params := statistics.RequestParams{Int1: 8, Int2: 9, Limit: 30, Str1: "eight", Str2: "nine"}
 	recordRequest(store, params, 4)
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 	rec := callStatisticsHandler(t, h)
 
 	if rec.Code != http.StatusOK {
@@ -123,7 +123,7 @@ func TestHandler_Statistics_ThroughRouter(t *testing.T) {
 	params := statistics.RequestParams{Int1: 3, Int2: 5, Limit: 15, Str1: "fizz", Str2: "buzz"}
 	recordRequest(store, params, 7)
 
-	h := NewHandler(store)
+	h := NewHandler(store, nil)
 
 	router := chi.NewRouter()
 	router.Get("/statistics", h.Statistics)
@@ -155,7 +155,7 @@ func TestHandler_Statistics_ConcurrentReads(t *testing.T) {
 		params := statistics.RequestParams{Int1: 3, Int2: 5, Limit: 15, Str1: "fizz", Str2: "buzz"}
 		recordRequest(store, params, 12)
 
-		h := NewHandler(store)
+		h := NewHandler(store, nil)
 
 		var wg sync.WaitGroup
 		for range 50 {
