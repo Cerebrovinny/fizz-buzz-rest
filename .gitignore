@@ -1,0 +1,42 @@
+# Build artifacts and binaries
+/bin/
+/dist/
+/tmp/
+/temp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.prof
+*.tmp
+*.log
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Coverage reports
+coverage.html
+coverage.txt
+
+# Generated directories
+secrets/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Docker and deployment
+docker-compose.override.yml
