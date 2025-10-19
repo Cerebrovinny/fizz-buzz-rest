@@ -9,11 +9,11 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
+
+	"github.com/Cerebrovinny/fizz-buzz-rest/internal/statistics"
 )
 
 func TestHandler_FizzBuzz(t *testing.T) {
-	h := NewHandler()
-
 	tests := []struct {
 		name           string
 		queryParams    string
@@ -173,6 +173,8 @@ func TestHandler_FizzBuzz(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			h := NewHandler(statistics.NewStore())
+
 			req := httptest.NewRequest(http.MethodGet, "/fizzbuzz?"+tc.queryParams, nil)
 			rec := httptest.NewRecorder()
 
@@ -217,7 +219,7 @@ func TestHandler_FizzBuzz(t *testing.T) {
 }
 
 func TestHandler_FizzBuzz_ThroughRouter(t *testing.T) {
-	h := NewHandler()
+	h := NewHandler(statistics.NewStore())
 	router := chi.NewRouter()
 	router.Get("/fizzbuzz", h.FizzBuzz)
 

@@ -10,12 +10,17 @@ import (
 	"strconv"
 
 	"github.com/Cerebrovinny/fizz-buzz-rest/internal/fizzbuzz"
+	"github.com/Cerebrovinny/fizz-buzz-rest/internal/statistics"
 )
 
-type Handler struct{}
+type Handler struct {
+	store *statistics.Store
+}
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(store *statistics.Store) *Handler {
+	return &Handler{
+		store: store,
+	}
 }
 
 type FizzBuzzResponse struct {

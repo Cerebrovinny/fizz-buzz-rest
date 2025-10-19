@@ -13,6 +13,8 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/Cerebrovinny/fizz-buzz-rest/internal/handler"
+	"github.com/Cerebrovinny/fizz-buzz-rest/internal/middleware"
+	"github.com/Cerebrovinny/fizz-buzz-rest/internal/statistics"
 )
 
 func main() {
@@ -21,9 +23,13 @@ func main() {
 		port = "8080"
 	}
 
+	store := statistics.NewStore()
+
 	router := chi.NewRouter()
-	h := handler.NewHandler()
-	router.Get("/fizzbuzz", h.FizzBuzz)
+
+	h := handler.NewHandler(store)
+	router.With(middleware.Statistics(store)).Get("/fizzbuzz", h.FizzBuzz)
+	router.Get("/statistics", h.Statistics)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", port),
