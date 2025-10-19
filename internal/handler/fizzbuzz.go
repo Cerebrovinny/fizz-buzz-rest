@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -14,12 +14,14 @@ import (
 )
 
 type Handler struct {
-	store *statistics.Store
+	store  *statistics.Store
+	logger *slog.Logger
 }
 
-func NewHandler(store *statistics.Store) *Handler {
+func NewHandler(store *statistics.Store, logger *slog.Logger) *Handler {
 	return &Handler{
-		store: store,
+		store:  store,
+		logger: logger,
 	}
 }
 
@@ -39,10 +41,12 @@ type fizzBuzzParams struct {
 	str2  string
 }
 
-func respondJSON(w http.ResponseWriter, status int, data interface{}) {
+func respondJSON(logger *slog.Logger, w http.ResponseWriter, status int, data interface{}) {
 	payload, err := json.Marshal(data)
 	if err != nil {
-		log.Printf("json marshal error: %v", err)
+		if logger != nil {
+			logger.Error("json marshal error", slog.String("error", err.Error()))
+		}
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -50,24 +54,32 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if _, err := w.Write(payload); err != nil {
-		log.Printf("json response write error: %v", err)
+		if logger != nil {
+			logger.Error("json response write error", slog.String("error", err.Error()))
+		}
 	}
 }
 
-func respondError(w http.ResponseWriter, status int, message string) {
-	respondJSON(w, status, ErrorResponse{Error: message})
+func respondError(logger *slog.Logger, w http.ResponseWriter, status int, message string) {
+	respondJSON(logger, w, status, ErrorResponse{Error: message})
 }
 
 func (h *Handler) FizzBuzz(w http.ResponseWriter, r *http.Request) {
 	params, err := parseFizzBuzzParams(r.URL.Query())
 	if err != nil {
-		respondError(w, http.StatusBadRequest, err.Error())
+		if h.logger != nil {
+			h.logger.Debug("validation error",
+				slog.String("error", err.Error()),
+				slog.String("path", r.URL.Path),
+			)
+		}
+		respondError(h.logger, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	result := fizzbuzz.Generate(params.int1, params.int2, params.limit, params.str1, params.str2)
 
-	respondJSON(w, http.StatusOK, FizzBuzzResponse{Result: result})
+	respondJSON(h.logger, w, http.StatusOK, FizzBuzzResponse{Result: result})
 }
 
 func parseFizzBuzzParams(values url.Values) (fizzBuzzParams, error) {

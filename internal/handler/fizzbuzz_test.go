@@ -173,7 +173,7 @@ func TestHandler_FizzBuzz(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			h := NewHandler(statistics.NewStore())
+			h := NewHandler(statistics.NewStore(), nil)
 
 			req := httptest.NewRequest(http.MethodGet, "/fizzbuzz?"+tc.queryParams, nil)
 			rec := httptest.NewRecorder()
@@ -219,7 +219,7 @@ func TestHandler_FizzBuzz(t *testing.T) {
 }
 
 func TestHandler_FizzBuzz_ThroughRouter(t *testing.T) {
-	h := NewHandler(statistics.NewStore())
+	h := NewHandler(statistics.NewStore(), nil)
 	router := chi.NewRouter()
 	router.Get("/fizzbuzz", h.FizzBuzz)
 
