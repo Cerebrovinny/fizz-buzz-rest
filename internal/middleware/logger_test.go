@@ -221,7 +221,9 @@ func TestRequestLogger_PreservesResponseWriter(t *testing.T) {
 	h.ServeHTTP(rec, req)
 
 	resp := rec.Result()
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if got := resp.StatusCode; got != http.StatusCreated {
 		t.Fatalf("StatusCode = %d, want %d", got, http.StatusCreated)

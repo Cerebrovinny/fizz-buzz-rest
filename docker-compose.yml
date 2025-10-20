@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  fizzbuzz-api:
+    container_name: fizzbuzz-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      LOG_LEVEL: "debug"
+      LOG_FORMAT: "text"
+      READ_TIMEOUT: "15s"
+      WRITE_TIMEOUT: "15s"
+      IDLE_TIMEOUT: "60s"
+      SHUTDOWN_TIMEOUT: "30s"
+      CORS_ALLOWED_ORIGINS: "*"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - fizzbuzz-network
+
+networks:
+  fizzbuzz-network:
+    driver: bridge

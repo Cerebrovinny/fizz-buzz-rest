@@ -1,0 +1,64 @@
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+AGENTS.md
+task.md
+LICENSE
+*.md
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.html
+coverage.txt
+*.prof
+
+# Tests
+*_test.go
+testdata/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+.dockerignore
+
+# Development tools
+Makefile
+.golangci.yml
+.pre-commit-config.yaml
+.air.toml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
